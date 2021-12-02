@@ -1,3 +1,7 @@
+## Composer install
+
+`composer require yiiman/functions`
+
 # توابع تاریخ جلالی
 
 توابع کاربردی برای برنامه نویسان php فارسی زبان
