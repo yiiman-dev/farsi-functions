@@ -1,0 +1,15 @@
+{
+    "name": "yiiman/functions",
+    "autoload": {
+        "psr-4": {
+            "YiiMan\\functions\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "YiiMan",
+            "email": "info@yiiman.i"
+        }
+    ],
+    "require": {}
+}
