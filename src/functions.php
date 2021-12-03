@@ -26,23 +26,17 @@ class functions extends JDF
     /**
      * Will Change yyyy-mm-dd hh:ii:ss from gregorian to shmsi(jalali)
      * @param $in_datetime
+     * @param  string  $delimiter
+     * @param  string  $target jalali | gregory
      * @return string will return string date and if DateTime was =='0000-00-00 00:00:00' will return '---'
      * @todo debug delimiter
      */
-    public function convert_dateTime($in_datetime, $delimiter = null)
+    public function convert_dateTime($in_datetime,$target = 'jalali', $delimiter = '-')
     {
         if ($in_datetime && $in_datetime != '0000-00-00 00:00:00') {
-
-            if ($delimiter) {
-                $datetime = explode($delimiter, $in_datetime);
-
-
-            } else {
-                $datetime = explode(' ', $in_datetime);
-
-            }
-
-            return self::jdate('Y/m/d', strtotime($datetime[0])).' - '.$datetime[1];
+            $dateExplited = explode(' ', $in_datetime);
+            $out= $this->convert_date($dateExplited[0],  $target,$delimiter).(!empty($dateExplited[1])?' '.$dateExplited[1]:'');
+            return $out;
         }
 
         return '---';
@@ -117,8 +111,9 @@ class functions extends JDF
                 if ($in_date == '0000-00-00') {
                     return null;
                 }
-
-                return str_replace('/', $delimiter, self::jdate('Y/m/d', strtotime($in_date)));
+                $converted=self::jdate('Y/m/d', strtotime($in_date));
+                $out= str_replace('/', $delimiter,$converted );
+                return $out;
             }
 
             return null;
