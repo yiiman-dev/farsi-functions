@@ -652,4 +652,71 @@ class functions extends JDF
         return round(abs($percentChange));
     }
 
+
+    /**
+     * میزان زمانی که گذشته را به صورت متنی بازگردانی میکند
+     *
+     *
+     * مثلا ده دقیقه قبل
+     *
+     *
+     * یک ساعت قبل
+     *
+     *
+     * یک ساعت بعد و ...
+     *
+     *
+     * @param $deadLine
+     * @return int|string
+     */
+    public function timeLeft($deadLine)
+    {
+        $deadLine = strtotime($deadLine);
+        $timeRemaining = $deadLine - $_SERVER['REQUEST_TIME'];
+        if ($timeRemaining < 0) {
+            $timeRemaining = abs($timeRemaining);
+            $end = \Yii::t('site', 'قبل');
+        } else if (!$timeRemaining) return 0;
+        else $end = \Yii::t('site', 'مانده');
+        $timeRemaining = $timeRemaining / (60 * 60 * 24 * 365);    //converted into years
+        $yrs = floor($timeRemaining);                        //removed the decimal part if any
+        $timeRemaining = (($timeRemaining - $yrs) * 365);         //converted into days
+        $days = floor($timeRemaining);                      //removed the decimal part if any
+        $timeRemaining = (($timeRemaining - $days) * 24);        //converted into hrs
+        $hrs = floor($timeRemaining);                      //removed the decimal part if any
+        $timeRemaining = (($timeRemaining - $hrs) * 60);        //converted into mins
+        $min = floor($timeRemaining);                     //removed decimals if any
+        $timeRemaining = (($timeRemaining - $min) * 60);       //converted into seconds
+        $sec = floor($timeRemaining);                    //removed decimals
+
+        if ($yrs) {
+            return $yrs . ' ' . \Yii::t('site', 'سال') . ' ' . $end;
+        }
+
+        if ($days > 31) {
+            return round($days / 30) . ' ' . \Yii::t('site', 'ماه') . ' ' . $end;
+        }
+
+        if ($days > 7) {
+            return round($days / 7) . ' ' . \Yii::t('site', 'هفته') . ' ' . $end;
+        }
+
+        if ($days) {
+            return $days . ' ' . \Yii::t('site', 'روز') . ' ' . $end;
+        }
+
+        if ($hrs) {
+            return $hrs . ' ' . \Yii::t('site', 'ساعت') . ' ' . $end;
+        }
+
+        if ($min) {
+            return $min . ' ' . \Yii::t('site', 'دقیقه') . ' ' . $end;
+        }
+
+        if ($sec) {
+            return \Yii::t('site', 'چند لحظه') . ' ' . $end;
+        }
+
+
+    }
 }
