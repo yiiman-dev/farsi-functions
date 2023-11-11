@@ -1,28 +1,10 @@
 <?php
-/**
- * Copyright (c) 2018.
- * Author: YiiMan Tm
- * Programmer: gholamreza beheshtian
- * mobile: 09353466620 | +17272282283
- * WebSite:http://yiiman.ir
- */
 
+namespace YiiMan\functions\Libraries;
 
-namespace YiiMan\functions;
-
-use DateTime;
 use YiiMan\functions\Libraries\JDF;
-use function date;
-use function round;
-use function strtotime;
-
-
-class functions
+class DateConverter
 {
-
-
-    const PRICE_UNIT_RIAL = 1;
-    const PRICE_UNIT_TOMAN = 2;
 
     /**
      * Will Change yyyy-mm-dd hh:ii:ss from gregorian to shmsi(jalali)
@@ -69,7 +51,7 @@ class functions
         //echo jdf::gregorian_to_jalali($datetime[0], $datetime[1], explode(' ', $datetime[2])[0], '/') .
         //   ' ' . explode(' ', $datetime[2])[1];
         $var1 = serialize(
-            self::gregorian_to_jalali(
+            JDF::gregorian_to_jalali(
                 $datetime[0],
                 $datetime[1],
                 explode(' ', $datetime[2])[0],
@@ -112,7 +94,7 @@ class functions
                 if ($in_date == '0000-00-00') {
                     return null;
                 }
-                $converted=self::jdate('Y/m/d', strtotime($in_date));
+                $converted=JDF::jdate('Y/m/d', strtotime($in_date));
                 $out= str_replace('/', $delimiter,$converted );
                 return $out;
             }
@@ -132,7 +114,7 @@ class functions
 
                         return implode(
                             $delimiter,
-                            self::jalali_to_gregorian(
+                            JDF::jalali_to_gregorian(
                                 $jdate[0],
                                 $jdate[1],
                                 $jdate[2]
@@ -159,7 +141,6 @@ class functions
         return $years[0].'-'.$years[1];
     }
 
-
     /**
      * @param $year string example 2017
      * @return string
@@ -172,153 +153,12 @@ class functions
         return $year;
     }
 
-    /**
-     * این تابع متن واحد پولی را گرفته سپس مبلغ را طبق تنظیمات داده شده رندر میکند و واحد پولی را به متن
-     * میپسباند و یک متن واحد که شامله عدد و واحد پولی میباشد را بر میگرداند
-     * @param          $price
-     * @param  string  $unit       واحد پولی مد نظر
-     * @param  string  $roundType  نوع رند سازی up|down
-     * @return string یک هزار تومان
-     */
-    public function priceText($price, string $unit = 'ریال', string $roundType = 'up')
-    {
-
-        if (empty($price)) {
-            return '0';
-        }
-        /* < Round Type > */
-        {
-            switch ($roundType) {
-                case 'up':
-                    $roundMode = PHP_ROUND_HALF_UP;
-                    break;
-                case 'down':
-                    $roundMode = PHP_ROUND_HALF_DOWN;
-                    break;
-                default:
-                    $roundMode = PHP_ROUND_HALF_DOWN;
-            }
-        }
-        /* </ Round Type > */
-
-        /* < Calculate Number > */
-        {
-            $text = '';
-            $price = round((float) $price, 0, $roundMode);
-
-
-            $length = strlen((string) $price);
-
-            /* < under thousant > */
-            {
-                if (4 > $length) {
-                    $text = $price;
-                    if (strpos((string) $price, '.') > 0) {
-                        return $text.' '.$unit;
-                    }
-                }
-            }
-            /* </ under thousent > */
-
-            /* < Million > */
-            {
-                if (3 < $length && $length < 7) {
-                    $text = $price / 1000;
-                    if (strpos((string) $price, '.') > 0) {
-                        return $text.' '.$unit;
-                    }
-                    $text .= ' هزار';
-                }
-            }
-            /* </ Million > */
-
-            /* < Million > */
-            {
-                if (6 < $length && $length < 10) {
-                    $text = $price / 1000000;
-                    if (strpos((string) $price, '.') > 0) {
-                        return $text.' '.$unit;
-                    }
-                    $text .= ' میلیون';
-                }
-            }
-            /* </ Million > */
-
-            /* < Milliard > */
-            {
-                if (9 < $length && $length < 13) {
-                    $text = $price / 1000000000;
-                    if (strpos((string) $price, '.') > 0) {
-                        return $text.' '.$unit;
-                    }
-                    $text .= ' میلیارد';
-                }
-            }
-            /* </ Milliard > */
-
-        }
-        /* </ Calculate Number > */
-
-        return $text.' '.$unit;
-
-    }
-
     public function YearToGregorian($year)
     {
         $year = $year.'-09-12';
         $year = substr($this->convert_date($year, 'gregory', '-'), 0, 4);
 
         return $year;
-    }
-
-    /**
-     * این تابع اعداد داخل یک رشته متنی را از فارسی به لاتین یا از لاتین به فارسی تبدیل میکند
-     * @param          $string
-     * @param  string  $type  toPersian | toLatin
-     * @return mixed
-     */
-    public function convertDigit($string, $type = 'toPersian')
-    {
-        $persian = [
-            '۰',
-            '۱',
-            '۲',
-            '۳',
-            '۴',
-            '۵',
-            '۶',
-            '۷',
-            '۸',
-            '۹'
-        ];
-        $arabic = [
-            '٩',
-            '٨',
-            '٧',
-            '٦',
-            '٥',
-            '٤',
-            '٣',
-            '٢',
-            '١',
-            '٠'
-        ];
-        switch ($type) {
-            case 'toPersian':
-                $num = range(0, 9);
-                $out = str_replace($num, $persian, $string);
-//					$out   = str_replace( $arabic , $num , $convertedPersianNums );
-                break;
-            case 'toLatin':
-                $num = range(0, 9);
-                $convertedPersianNums = str_replace($persian, $num, $string);
-                $out = str_replace($arabic, $num, $convertedPersianNums);
-                break;
-
-        }
-
-
-        return $out;
     }
 
     /**
@@ -353,7 +193,6 @@ class functions
         }
         return '';
     }
-
 
     /**
      * تاریخ ثبت  را به صورت شمسی بازگردانی میکند
@@ -497,7 +336,6 @@ class functions
         }
     }
 
-
     public function differenceHour($startDate, $endDate)
     {
         $date1 = $startDate;
@@ -515,18 +353,12 @@ class functions
         return floor($diff / (60 * 60));
     }
 
-    /**
-     * این تابع اختلاف سال بین دو تاریخ را برمیگرداند، ورودی باید به میلادی باشد
-     * @param $startDate
-     * @param $endDate
-     * @return int
-     */
     public function differenceDateYear($startDate, $endDate)
     {
 
 
-        $d1 = new DateTime($endDate);
-        $d2 = new DateTime($startDate);
+        $d1 = new \DateTime($endDate);
+        $d2 = new \DateTime($startDate);
 
         $diff = $d2->diff($d1);
 
@@ -545,8 +377,8 @@ class functions
     {
 
 
-        $d1 = new DateTime($endDate);
-        $d2 = new DateTime($startDate);
+        $d1 = new \DateTime($endDate);
+        $d2 = new \DateTime($startDate);
 
         $diff = $d2->diff($d1);
         $year = $diff->y;
@@ -556,12 +388,6 @@ class functions
         return $days + ($month * 30) + ($year * 365);
     }
 
-
-    /**
-     * @param $now  string تاریخ فعلی
-     * @param $text string متن تاریخ جدید  مثال : +1 hour or   -1day
-     * @return false|string
-     */
     public function manipulicateDate($now, $text)
     {
         return date(
@@ -587,73 +413,6 @@ class functions
         );
     }
 
-    public function limitText($text, $charCount = 500)
-    {
-        if (empty($text)) {
-            return '';
-        }
-        $string = strip_tags($text);
-        if (strlen($string) > $charCount) {
-
-            // truncate string
-            $stringCut = substr($string, 0, $charCount);
-            $endPoint = strrpos($stringCut, ' ');
-
-            //if the string doesn't contain any space then it will cut without word basis.
-            $string = $endPoint ? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-            $string .= '...';
-        }
-        return $string;
-    }
-
-    /**
-     * return user client ip
-     * @return mixed|string
-     */
-    public function getClientIP()
-    {
-        $ipaddress = 'UNKNOWN';
-        $keys = [
-            'HTTP_CLIENT_IP',
-            'HTTP_X_FORWARDED_FOR',
-            'HTTP_X_FORWARDED',
-            'HTTP_FORWARDED_FOR',
-            'HTTP_FORWARDED',
-            'REMOTE_ADDR'
-        ];
-        foreach ($keys as $k) {
-            if (isset($_SERVER[$k]) && !empty($_SERVER[$k]) && filter_var($_SERVER[$k], FILTER_VALIDATE_IP)) {
-                $ipaddress = $_SERVER[$k];
-                break;
-            }
-        }
-        return $ipaddress;
-    }
-
-    /**
-     *  مقدار درصد درخواستی از یک عدد را محاسبه میکند
-     * @param $total
-     * @param $percent
-     * @return float
-     */
-    public function percent2NumberCalculator($total, $percent)
-    {
-        return ($percent / 100) * $total;
-    }
-
-    /**
-     * درصد تغیر بین دو عدد را بازگردانی میکند
-     * @param $oldFigure
-     * @param $newFigure
-     * @return float
-     */
-    public function number2percentCalculator($oldFigure, $newFigure)
-    {
-        $percentChange = (($oldFigure - $newFigure) / $oldFigure) * 100;
-        return round(abs($percentChange));
-    }
-
-
     /**
      * میزان زمانی که گذشته را به صورت متنی بازگردانی میکند
      *
@@ -676,9 +435,9 @@ class functions
         $timeRemaining = $deadLine - $_SERVER['REQUEST_TIME'];
         if ($timeRemaining < 0) {
             $timeRemaining = abs($timeRemaining);
-            $end = \Yii::t('site', 'قبل');
+            $end =  'قبل';
         } else if (!$timeRemaining) return 0;
-        else $end = \Yii::t('site', 'مانده');
+        else $end =  'مانده';
         $timeRemaining = $timeRemaining / (60 * 60 * 24 * 365);    //converted into years
         $yrs = floor($timeRemaining);                        //removed the decimal part if any
         $timeRemaining = (($timeRemaining - $yrs) * 365);         //converted into days
@@ -691,33 +450,36 @@ class functions
         $sec = floor($timeRemaining);                    //removed decimals
 
         if ($yrs) {
-            return $yrs . ' ' . \Yii::t('site', 'سال') . ' ' . $end;
+            return $yrs . ' ' .  'سال' . ' ' . $end;
         }
 
         if ($days > 31) {
-            return round($days / 30) . ' ' . \Yii::t('site', 'ماه') . ' ' . $end;
+            return round($days / 30) . ' ' .  'ماه' . ' ' . $end;
         }
 
         if ($days > 7) {
-            return round($days / 7) . ' ' . \Yii::t('site', 'هفته') . ' ' . $end;
+            return round($days / 7) . ' ' .  'هفته' . ' ' . $end;
         }
 
         if ($days) {
-            return $days . ' ' . \Yii::t('site', 'روز') . ' ' . $end;
+            return $days . ' ' .  'روز' . ' ' . $end;
         }
 
         if ($hrs) {
-            return $hrs . ' ' . \Yii::t('site', 'ساعت') . ' ' . $end;
+            return $hrs . ' ' .  'ساعت' . ' ' . $end;
         }
 
         if ($min) {
-            return $min . ' ' . \Yii::t('site', 'دقیقه') . ' ' . $end;
+            return $min . ' ' .  'دقیقه' . ' ' . $end;
         }
 
         if ($sec) {
-            return \Yii::t('site', 'چند لحظه') . ' ' . $end;
+            return  'چند لحظه' . ' ' . $end;
         }
 
 
     }
+
+
+
 }
